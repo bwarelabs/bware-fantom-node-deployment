@@ -12,7 +12,7 @@ git clone https://github.com/bwarelabs/fantom-dc-demo.git
 ```
 - Go to the fantom-node-deployment directory
 ```
-cd fantom-dc-demo/charts/fantom-node-deployment
+cd bware-fantom-node-deployment/charts/fantom-node-deployment
 ```
 - Run the following command to install via Helm:
 
