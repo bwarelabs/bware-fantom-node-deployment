@@ -1,4 +1,4 @@
-## ![alt text](/docs/BWARE-icon.png) Building your own Fantom Read-Only Node image
+# [BwareLabs] Building your own Fantom Read-Only Node image
 
 ## ![alt text](/docs/BWARE-icon.png) Prerequisites
 - [Docker](https://docs.docker.com/get-docker/)
