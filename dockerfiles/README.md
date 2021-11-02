@@ -12,13 +12,11 @@ git clone https://github.com/bwarelabs/bware-fantom-node-deployment.git
 ```
 cd bware-fantom-node-deployment/dockerfiles
 ```
-
-For testnet:
+- For testnet:
 ```
 docker build -f testnet.Dockerfile
 ```
-
-For mainnet:
+- For mainnet:
 ```
 docker build -f mainnet.Dockerfile
 ```
