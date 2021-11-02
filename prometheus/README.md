@@ -13,7 +13,7 @@ helm repo update
 ```
 - Clone the repository
 ```
-git clone https://github.com/bwarelabs/fantom-dc-demo.git
+git clone https://github.com/bwarelabs/bware-fantom-node-deployment.git
 ```
 - Go to the prometheus directory
 ```
