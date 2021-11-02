@@ -4,6 +4,14 @@
 - [Docker](https://docs.docker.com/get-docker/)
 
 ## ![alt text](/docs/BWARE-icon.png) Building your own Docker image
+- Clone the repository
+```
+git clone https://github.com/bwarelabs/bware-fantom-node-deployment.git
+```
+- Go to the fantom-node-deployment directory
+```
+cd bware-fantom-node-deployment/dockerfiles
+```
 
 For testnet:
 ```
