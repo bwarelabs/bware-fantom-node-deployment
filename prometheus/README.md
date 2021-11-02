@@ -17,7 +17,7 @@ git clone https://github.com/bwarelabs/fantom-dc-demo.git
 ```
 - Go to the prometheus directory
 ```
-cd fantom-dc-demo/prometheus
+cd bware-fantom-node-deployment/prometheus
 ```
 - Edit the values.yaml file - lines 1330, 1335, 1348 - to add your Slack API URL + the name of your slack channel (see here more about [Incoming Webhooks](https://api.slack.com/messaging/webhooks))
 - Run the following command to install via Helm:
