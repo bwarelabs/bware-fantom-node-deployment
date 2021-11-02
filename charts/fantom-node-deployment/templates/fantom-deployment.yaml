@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fantom-node
+  labels:
+    app: {{ template "app.fullname" . }}
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: fantom-node
+    app.kubernetes.io/name: fantom-node
+    app.kubernetes.io/part-of: chain-fantom
+    app.kubernetes.io/role: fantom
+    chain: fantom   
+    network: {{ .Values.network }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: fantom-node
+      app.kubernetes.io/name: fantom-node
+      app.kubernetes.io/part-of: chain-fantom
+      app.kubernetes.io/role: fantom
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: fantom-node
+        app.kubernetes.io/name: fantom-node
+        app.kubernetes.io/part-of: chain-fantom
+        app.kubernetes.io/role: fantom
+        chain: fantom        
+        network: {{ .Values.network }}
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      volumes:
+        - name: liveness-script
+          configMap:
+            name: liveness-script
+            defaultMode: 0755
+        - name: readiness-script
+          configMap:
+            name: readiness-script
+            defaultMode: 0755
+        - name: data
+          persistentVolumeClaim:
+            claimName: fantom-node-pvc
+      initContainers:
+        - name: take-data-dir-ownership
+          image: {{ .Values.sidecar.image.name }}:{{ .Values.sidecar.image.tag }}
+          command:
+            - chown
+            - -R
+            - 1000:1000
+            - /node/data
+          volumeMounts:
+            - name: data
+              mountPath: /node/data
+      containers:
+        - name: fantom
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          command: 
+            - opera
+          args:
+            - '--genesis'
+            - /fantom/{{ .Values.network }}.g
+            - '--datadir'
+            - /node/data/.opera
+            - '--http.api="ftm,eth,web3,net,txpool,sfc"' 
+            - '--metrics'
+            - '--pprof' 
+            - '--pprof.addr' 
+            - '0.0.0.0' 
+            - '--pprof.port'
+            - '6060' 
+            - '--http' 
+            - '--http.addr' 
+            - '0.0.0.0'
+            - '--http.vhosts=*'
+            - '--http.corsdomain=*' 
+            - '--ws' 
+            - '--ws.addr' 
+            - '0.0.0.0' 
+            - '--ws.origins=*'
+            - '--ws.api="ftm,eth,web3,net,txpool,sfc"' 
+            - '--datadir.minfreedisk=8096'
+          volumeMounts:
+            - name: data
+              mountPath: /node/data
+          ports:
+            - name: p2p
+              containerPort: 5050
+              protocol: TCP
+            - name: monitoring
+              containerPort: 6060
+              protocol: TCP
+            - name: rpc
+              containerPort: 18545
+              protocol: TCP
+            - name: ws
+              containerPort: 18546
+              protocol: TCP
+        {{ if eq $.Values.network "testnet" }}
+          resources:
+            limits:
+              cpu: 2
+              memory: 4Gi
+            requests:
+              cpu: 1
+              memory: 2Gi   
+        {{ else }}
+          resources:
+            limits:
+              cpu: 3
+              memory: 6Gi
+            requests:
+              cpu: 1500m
+              memory: 4Gi  
+        {{ end }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+        - name: sidecar
+          image: {{ .Values.sidecar.image.name }}:{{ .Values.sidecar.image.tag }}
+          imagePullPolicy: Always
+          command:
+            - /bin/ash
+            - '-c'
+            - >-
+              while true; do sleep 2; done
+          volumeMounts:
+          - name: liveness-script
+            mountPath: /scripts/liveness.sh
+            subPath: liveness.sh
+          - name: readiness-script
+            mountPath: /scripts/readiness.sh
+            subPath: readiness.sh
+          {{ if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /scripts/liveness.sh
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          {{ end }}
+          {{ if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - /scripts/readiness.sh
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+        {{ end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

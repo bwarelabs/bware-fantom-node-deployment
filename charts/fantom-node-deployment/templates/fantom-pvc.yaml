@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fantom-node-pvc
+  labels:
+    app: {{ template "app.fullname" . }}
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    chain: fantom
+    network: {{ .Values.network }}
+    app.kubernetes.io/instance: fantom-node
+    app.kubernetes.io/name: fantom-node
+    app.kubernetes.io/part-of: chain-fantom
+    app.kubernetes.io/role: fantom
+spec:
+{{ if eq $.Values.network "mainnet" }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1000Gi
+{{ else if eq $.Values.network "testnet" }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+{{ end }}

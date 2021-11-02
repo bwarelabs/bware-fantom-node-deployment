@@ -1,0 +1,31 @@
+replicaCount: 1
+hostNetwork: false
+imagePullPolicy: Always
+
+network: testnet
+
+image:
+  name: bwarelabs/fantom-dc-demo
+  tag: testnet
+
+sidecar:
+  image:
+    name: bwarelabs/probe-sidecar
+    tag: 0.0.1
+
+tolerations: []
+
+livenessProbe:
+  enabled: true
+  failureThreshold: 3
+  initialDelaySeconds: 480
+  periodSeconds: 30
+  successThreshold: 1
+  timeoutSeconds: 10
+readinessProbe:
+  enabled: true
+  failureThreshold: 3
+  initialDelaySeconds: 540
+  periodSeconds: 300
+  successThreshold: 1
+  timeoutSeconds: 10

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: readiness-script
+data:
+  readiness.sh: |
+    #!/bin/sh
+    state=$(curl -H "Content-Type: application/json" -d '{"id":1, "jsonrpc":"2.0", "method": "eth_syncing","params": []}' --silent localhost:18545 | jq '.result')
+    if [[ $state == "false" ]];then
+        exit 0
+    else
+        exit 1
+    fi
