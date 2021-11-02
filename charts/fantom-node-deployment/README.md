@@ -8,7 +8,7 @@
 - Check the values file and edit based on your choice (momentarily, it is very simple and not so customizable - WIP more parameters and much more flexibility)
 - Clone the repository
 ```
-git clone https://github.com/bwarelabs/fantom-dc-demo.git
+git clone https://github.com/bwarelabs/bware-fantom-node-deployment.git
 ```
 - Go to the fantom-node-deployment directory
 ```
